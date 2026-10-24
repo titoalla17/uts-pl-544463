@@ -139,3 +139,15 @@ di `frontend/src/services/api.js` dari variabel `VITE_API_BASE_URL`.
 - Seeder demo memperbarui password akun dari ENV saat service dinyalakan ulang.
 - HTTPS, rate limiting, rotasi secrets, dan pengelolaan akses diperlukan jika akan
   dipakai secara publik, bukan hanya lokal UTS.
+
+# \## Alur Pengembangan
+
+# 
+
+# 1\. Fitur baru dikerjakan pada branch `feat/\*`.
+
+# 2\. Perubahan fitur diajukan melalui Pull Request ke branch `dev`.
+
+# 3\. Perubahan yang siap dirilis diajukan melalui Pull Request dari `dev` ke `main`.
+
+# 4\. GitHub Actions menjalankan pengujian backend dan build frontend sebelum perubahan digabungkan.
