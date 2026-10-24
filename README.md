@@ -151,4 +151,3 @@ di `frontend/src/services/api.js` dari variabel `VITE_API_BASE_URL`.
 # 3\. Perubahan yang siap dirilis diajukan melalui Pull Request dari `dev` ke `main`.
 
 # 4\. GitHub Actions menjalankan pengujian backend dan build frontend sebelum perubahan digabungkan.
-
