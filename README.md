@@ -1,58 +1,149 @@
-# FilmKu - Template UTS Pemrograman Lanjut
+# 🎬 FilmKu — Diary & Manajemen Film
 
-**Nama repository akhir:** `uts-pl-NIM` (ganti NIM Anda)  
-**Tema:** Diary & Manajemen Film (terinspirasi Letterboxd) — catat film yang ditonton, beri rating bintang 0.5–5, tulis ulasan, dan tandai favorit.
+FilmKu adalah aplikasi web untuk mencatat dan mengelola film yang telah ditonton. Terinspirasi dari Letterboxd, aplikasi ini memungkinkan pengguna menyimpan daftar film, memberikan rating, menulis ulasan, dan menandai film favorit.
 
-Ini adalah **starter project yang perlu di-bootstrap sekali** karena kerangka Laravel,
-`backend/composer.lock`, dan `frontend/package-lock.json` dihasilkan di komputer
-Anda. **Jangan kirim repository untuk penilaian sebelum bootstrap, dua lockfile,
-CI, dan Compose selesai diuji.**
+Project ini dikembangkan untuk memenuhi tugas UTS mata kuliah **Pemrograman Lanjut**.
 
-## Prasyarat
+## ✨ Fitur Utama
 
-- PHP >= 8.2 dan Composer 2; Node.js 22 + npm; Git; Docker Engine + Compose v2.
-- Internet saat `./bootstrap.sh` untuk mengunduh Laravel, Sanctum, Vue, dan dependensinya.
-- Akun GitHub publik dan Postman.
+- **Autentikasi pengguna** — Login dan logout menggunakan token.
+- **Manajemen film (CRUD)** — Menambah, melihat, mengubah, dan menghapus catatan film.
+- **Rating film** — Memberikan rating bintang 0,5–5.
+- **Ulasan film** — Menulis ulasan untuk film yang ditonton.
+- **Film favorit** — Menandai film favorit.
+- **Penyimpanan database** — Data disimpan di MySQL dan tetap tersedia setelah container dimulai ulang.
+- **RESTful API** — Backend menyediakan API dengan respons JSON dan kode HTTP yang sesuai.
+- **Pengujian API** — Koleksi Postman tersedia untuk menguji autentikasi, CRUD, validasi, dan akses tanpa token.
+- **CI/CD otomatis** — GitHub Actions menjalankan pengujian backend, build frontend, dan publikasi image Docker ke GHCR.
 
-## 1. Bootstrap proyek (sekali di laptop, sebelum push)
+## 🛠️ Teknologi yang Digunakan
 
-```bash
-chmod +x bootstrap.sh
-./bootstrap.sh
+| Komponen | Teknologi |
+|---|---|
+| Backend | Laravel 12, PHP |
+| Autentikasi API | Laravel Sanctum |
+| Frontend | Vue.js, JavaScript |
+| HTTP client | Axios |
+| Database | MySQL |
+| Web server frontend | Nginx |
+| Runtime backend | FrankenPHP |
+| Containerization | Docker, Docker Compose |
+| API testing | Postman |
+| CI/CD | GitHub Actions |
+| Container registry | GitHub Container Registry (GHCR) |
+
+## 📁 Struktur Repository
+
+```text
+uts-pl-544463/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── backend/
+│   ├── app/
+│   ├── database/
+│   ├── routes/
+│   ├── tests/
+│   ├── Dockerfile
+│   ├── composer.json
+│   └── composer.lock
+├── frontend/
+│   ├── src/
+│   ├── Dockerfile
+│   ├── nginx.conf
+│   ├── package.json
+│   └── package-lock.json
+├── postman/
+│   └── FilmKu.postman_collection.json
+├── .dockerignore
+├── .env.example
+├── docker-compose.yml
+└── README.md
 ```
 
-Bash script membuat Laravel 12 di folder sementara, menjalankan `php artisan install:api`,
-menyalin kerangka yang belum ada ke folder `backend/` sambil mempertahankan file
-aplikasi UTS, lalu menjalankan `npm install` di `frontend/`. Keduanya menghasilkan
-**`backend/composer.lock` dan `frontend/package-lock.json`**, yang WAJIB di-commit.
+## 🚀 Menjalankan Aplikasi
 
-Jika menggunakan Windows tanpa Bash, gunakan WSL Ubuntu atau Git Bash + PHP/Composer/npm.
+### Prasyarat
 
-## 2. Buat .env root (jangan pernah commit)
+Pastikan perangkat sudah memiliki:
+
+- Docker Engine atau Docker Desktop.
+- Docker Compose v2.
+- Git.
+
+### 1. Clone repository
+
+```bash
+git clone https://github.com/titoalla17/uts-pl-544463.git
+cd uts-pl-544463
+```
+
+### 2. Konfigurasi environment
+
+Buat file `.env` di root project dengan menyalin `.env.example`.
+
+**Windows PowerShell:**
+
+```powershell
+Copy-Item .env.example .env
+```
+
+**Linux/macOS:**
 
 ```bash
 cp .env.example .env
-php -r 'echo "base64:".base64_encode(random_bytes(32)).PHP_EOL;'
 ```
 
-Masukkan hasil perintah kedua sebagai `APP_KEY` di `.env`. **Ubah password contoh**
-`DB_PASSWORD`, `DB_ROOT_PASSWORD` dan `DEMO_PASSWORD`. Akun demo yang disemai:
-`DEMO_EMAIL` + `DEMO_PASSWORD`. Jangan mengunggah screenshot yang menampilkan nilai password.
+Sesuaikan nilai environment yang diperlukan, terutama `APP_KEY`, `DB_PASSWORD`, `DB_ROOT_PASSWORD`, `DEMO_EMAIL`, dan `DEMO_PASSWORD`.
 
-## 3. Jalankan dan verifikasi
+Untuk membuat application key, jalankan:
+
+```bash
+php -r "echo 'base64:'.base64_encode(random_bytes(32)).PHP_EOL;"
+```
+
+Masukkan hasilnya sebagai nilai `APP_KEY` di `.env`. Gunakan password yang aman dan jangan membagikan kredensial tersebut.
+
+> **Penting:** File `.env` hanya untuk konfigurasi lokal dan tidak boleh di-commit ke Git. Gunakan `.env.example` sebagai referensi konfigurasi.
+
+### 3. Build dan jalankan container
+
+Dari direktori root project, jalankan:
 
 ```bash
 docker compose up -d --build
-docker compose ps
-docker compose logs -f backend
 ```
 
-- Frontend: **http://localhost:8080**
-- API login: **http://localhost:8000/api/login** (POST JSON)
-- Akun login: sesuai `DEMO_EMAIL` dan `DEMO_PASSWORD` dalam `.env` root.
-- Login/tambah/ubah/hapus via frontend lalu refresh browser.
+Perintah tersebut membangun image yang diperlukan dan menjalankan tiga layanan utama:
 
-Sebelum screenshot volume, buat data lalu:
+- **Frontend** — Antarmuka Vue.js yang dilayani Nginx.
+- **Backend** — RESTful API Laravel yang berjalan dengan FrankenPHP.
+- **Database** — MySQL untuk menyimpan data aplikasi.
+
+Periksa status container:
+
+```bash
+docker compose ps
+```
+
+Pastikan ketiga layanan berjalan dengan baik.
+
+### 4. Akses aplikasi
+
+| Layanan | Alamat |
+|---|---|
+| Frontend | http://localhost:8080 |
+| API login | `POST http://localhost:8000/api/login` |
+
+Gunakan kredensial demo sesuai konfigurasi `DEMO_EMAIL` dan `DEMO_PASSWORD` di file `.env`.
+
+Setelah login, coba tambahkan film, ubah data film, hapus film, dan muat ulang halaman untuk memverifikasi fungsionalitas aplikasi.
+
+### 5. Memverifikasi persistensi data
+
+Data disimpan pada named volume MySQL sehingga tidak hilang hanya karena container dihentikan dan dijalankan kembali.
+
+Untuk menguji persistensi:
 
 ```bash
 docker compose down
@@ -60,94 +151,155 @@ docker compose up -d
 docker compose ps
 ```
 
-Data harus tetap ada. **Jangan memakai `docker compose down -v`**, karena flag `-v`
-menghapus named volume data.
+Buka kembali aplikasi dan periksa data yang sebelumnya disimpan.
 
-## 4. Tes backend
+> Jangan menggunakan `docker compose down -v` saat menguji persistensi karena opsi `-v` dapat menghapus named volume database.
+
+## 🔌 RESTful API
+
+Backend Laravel menyediakan API untuk autentikasi dan pengelolaan data film.
+
+| Operasi | Keterangan |
+|---|---|
+| Login | Memperoleh token autentikasi |
+| Logout | Mengakhiri sesi autentikasi melalui API |
+| List film | Menampilkan daftar film |
+| Detail film | Mengambil data satu film |
+| Create film | Menambahkan film baru |
+| Update film | Mengubah data film |
+| Delete film | Menghapus data film |
+
+Endpoint yang memerlukan autentikasi harus menyertakan token pada request. API menggunakan format JSON serta kode HTTP yang sesuai, termasuk `201 Created`, `401 Unauthorized`, dan `422 Unprocessable Entity` untuk kondisi yang relevan.
+
+Detail request, parameter, dan contoh respons tersedia pada koleksi Postman di `postman/FilmKu.postman_collection.json`.
+
+## 🧪 Pengujian
+
+### Pengujian backend
+
+Pastikan dependensi backend sudah tersedia, kemudian jalankan dari direktori `backend/`:
 
 ```bash
-cd backend
 php artisan test
 ```
 
-Atau pada komputer host tanpa ekstensi SQLite, gunakan GitHub Actions yang
-memasang `pdo_sqlite`. CI menjalankan `composer install`, `php artisan test`,
-`npm ci`, `npm run build`.
+Pengujian mencakup perilaku API dan dapat digunakan untuk memverifikasi fungsionalitas backend.
 
-## 5. Postman
+### Pengujian menggunakan Postman
 
-Impor `postman/FilmKu.postman_collection.json`; ubah Collection Variables:
-`base_url`, `email`, dan `password`. Eksekusi Login untuk menyimpan `token`.
-Lanjutkan daftar / tambah (menyimpan `film_id`) / detail / update / validasi / hapus /
-logout; request 09 menguji akses tanpa token menghasilkan 401.
+1. Buka Postman.
+2. Impor `postman/FilmKu.postman_collection.json`.
+3. Sesuaikan Collection Variables `base_url`, `email`, dan `password`.
+4. Jalankan request login untuk memperoleh token.
+5. Uji daftar film, penambahan, detail, pembaruan, validasi, penghapusan, dan logout.
+6. Jalankan request akses tanpa token untuk memverifikasi respons `401 Unauthorized`.
 
-## 6. GitHub, branch, PR, status checks
+Jangan menyimpan token autentikasi atau password pribadi di dalam collection yang di-commit ke repository.
 
-1. Buat repository **public** `uts-pl-NIM` via GitHub UI dengan initial README.
-2. Buat branch `dev` dari `main` lewat GitHub UI. Setel Git remote lokal.
-3. Buat branch fitur dari dev: `git switch -c feature/film-crud`; commit semua
-   source **setelah bootstrap**, kemudian `git push -u origin feature/film-crud`.
-4. Buat PR `feature/film-crud` → `dev`, tunggu dua check hijau, lalu merge.
-5. **Sebelum merge ke main**, siapkan GitHub Secrets `APP_KEY` dan `DB_PASSWORD`
-   (nilainya dari `.env` lokal; jangan commit nilainya).
-6. Buat PR `dev` → `main`, tunggu dua check hijau, lalu merge.
-7. Aktifkan Rulesets (Settings → Rules) untuk `main` dan `dev`: Require PR,
-   require status checks (`backend-test`, `frontend-build`), blokir force push,
-   jangan beri bypass kepada diri sendiri bila tersedia.
-8. Untuk memenuhi aturan PR sejak awal, atur rules sesegera mungkin. Status
-   checks baru bisa dipilih setelah workflow berhasil berjalan paling tidak sekali.
-   Screenshot aturan final kedua branch wajib dibuat setelah konfigurasi benar.
-9. Jika repo memakai pembatasan izin paket, pastikan Actions mempunyai akses
-   write packages. Pastikan kedua Secrets sudah dibuat sebelum deploy pertama.
+## 🐳 Arsitektur Docker
 
-Workflow `.github/workflows/ci.yml` melakukan build+test pada PR/dev/fitur, tapi
-job `deploy` hanya dieksekusi pada **push `main` setelah kedua job lolos**.
-Dua image dikirim ke `ghcr.io/<owner>/<repo>-backend:sha-<commit>` dan
-`ghcr.io/<owner>/<repo>-frontend:sha-<commit>`. Job tersebut **publikasi image**
-ke GHCR, bukan otomatis menjalankan container di server publik.
+Aplikasi menggunakan Docker Compose untuk menjalankan frontend, backend, dan database dalam container terpisah.
 
-## 7. Menyusun laporan PDF
-
-Gunakan `LAPORAN_TEMPLATE.md`, isi nama/NIM, tautan repository dan Actions, kendala
-nyata dan screenshot hasil tes. Ekspor sebagai PDF dan unggah ke Classroom.
-Checklist bukti: Postman 200/201/401/422, fitur Vue, tes Laravel, PR,
-branch protections, CI hijau, deploy hijau/main, deploy skipped/dev, dua Packages,
-Dockerfiles, `docker compose ps`, volume tetap, log FrankenPHP, dan CRUD dari browser.
-
-## Jalur aliran data
-
-```
-Browser -> Nginx Vue (frontend:80, publik 8080)
-              | /api/* reverse proxy ke backend:80
-              v
-         FrankenPHP -> Laravel Sanctum & CRUD
-              |
-              v
-          MySQL (db:3306) -> named volume mysql_data
+```text
+Browser
+   |
+   v
+Frontend: Vue.js + Nginx
+   |  localhost:8080
+   |
+   | /api/* melalui reverse proxy
+   v
+Backend: FrankenPHP + Laravel
+   |  API, autentikasi, dan CRUD
+   |
+   v
+Database: MySQL
+   |  db:3306
+   v
+Named Volume: mysql_data
 ```
 
-**Alasan proxy:** browser tidak mengenal hostname internal Docker `backend`,
-sehingga browser meminta `/api` ke origin frontend yang sama. Nginx di container
-frontend-lah yang menghubungi service `backend`. Base URL Axios dikonfigurasi
-di `frontend/src/services/api.js` dari variabel `VITE_API_BASE_URL`.
+Frontend menggunakan Axios untuk mengirim request ke API. Konfigurasi alamat API terdapat pada `frontend/src/services/api.js` melalui variabel `VITE_API_BASE_URL`.
 
-## Catatan keamanan
+Nginx pada container frontend meneruskan request `/api/*` ke layanan backend melalui jaringan internal Docker. Dengan demikian, browser tidak perlu mengakses hostname internal Docker secara langsung.
 
-- `.env` serta password dan token nyata tidak dimasukkan ke Git.
-- Token disimpan `sessionStorage` (untuk demonstrasi tugas); untuk produk nyata,
-  peninjauan keamanan autentikasi dan cookie HttpOnly tetap diperlukan.
-- Seeder demo memperbarui password akun dari ENV saat service dinyalakan ulang.
-- HTTPS, rate limiting, rotasi secrets, dan pengelolaan akses diperlukan jika akan
-  dipakai secara publik, bukan hanya lokal UTS.
+MySQL menggunakan named volume untuk mempertahankan data ketika container dihentikan atau dibuat ulang.
 
-# \## Alur Pengembangan
+## ⚙️ CI/CD dengan GitHub Actions
 
-# 
+Workflow tersedia di `.github/workflows/ci.yml`.
 
-# 1\. Fitur baru dikerjakan pada branch `feat/\*`.
+### Continuous Integration (CI)
 
-# 2\. Perubahan fitur diajukan melalui Pull Request ke branch `dev`.
+GitHub Actions menjalankan dua job utama:
 
-# 3\. Perubahan yang siap dirilis diajukan melalui Pull Request dari `dev` ke `main`.
+- **`backend-test`** — Memasang dependensi backend dan menjalankan `php artisan test`.
+- **`frontend-build`** — Memasang dependensi frontend menggunakan `npm ci` dan memvalidasi build menggunakan `npm run build`.
 
-# 4\. GitHub Actions menjalankan pengujian backend dan build frontend sebelum perubahan digabungkan.
+Workflow digunakan untuk memeriksa perubahan sebelum Pull Request dapat digabungkan.
+
+### Continuous Delivery (CD)
+
+Job `deploy` hanya berjalan pada push ke branch `main` setelah job pengujian dan build berhasil.
+
+Job ini membangun dan memublikasikan dua image Docker ke GitHub Container Registry (GHCR):
+
+```text
+ghcr.io/<owner>/<repo>-backend:sha-<commit>
+ghcr.io/<owner>/<repo>-frontend:sha-<commit>
+```
+
+Tag image menggunakan commit SHA agar setiap image dapat ditelusuri ke versi source code yang membangunnya.
+
+GitHub Actions menggunakan GitHub Secrets untuk konfigurasi sensitif, termasuk `APP_KEY` dan `DB_PASSWORD`. Nilai rahasia tidak disimpan langsung di workflow atau repository.
+
+**Catatan:** Workflow CD memublikasikan image ke GHCR. Publikasi image ini tidak dengan sendirinya berarti aplikasi sudah dijalankan pada server hosting publik.
+
+## 🌿 Alur Pengembangan Git
+
+Pengembangan menggunakan feature branch, Pull Request, dan branch utama yang dilindungi.
+
+```text
+feat/*
+   |
+   | Pull Request
+   v
+  dev
+   |
+   | Pull Request
+   v
+  main
+   |
+   v
+GitHub Actions: Build & Test
+   |
+   v
+Publikasi image Docker ke GHCR
+```
+
+Ketentuan alur kerja:
+
+1. Fitur baru dikembangkan pada branch `feat/*`.
+2. Perubahan diajukan melalui Pull Request dari feature branch ke `dev`.
+3. CI harus berhasil sebelum perubahan digabungkan.
+4. Perubahan yang siap dirilis diajukan melalui Pull Request dari `dev` ke `main`.
+5. Push ke `main` memicu proses CD jika job CI berhasil.
+6. Branch `main` dan `dev` menggunakan perlindungan branch sesuai konfigurasi repository.
+
+## 🔐 Catatan Keamanan
+
+- Jangan commit file `.env`, password, application key, atau token autentikasi.
+- Gunakan GitHub Secrets untuk konfigurasi sensitif pada workflow.
+- Token autentikasi frontend disimpan dalam `sessionStorage` untuk kebutuhan demonstrasi tugas.
+- Implementasi ini ditujukan untuk pembelajaran. Penggunaan produksi memerlukan peninjauan keamanan tambahan, HTTPS, rate limiting, dan pengelolaan kredensial yang sesuai.
+
+## 👨‍🎓 Informasi Project
+
+- **Nama aplikasi:** FilmKu
+- **Mata kuliah:** Pemrograman Lanjut
+- **Jenis project:** Ujian Tengah Semester (UTS)
+- **Repository:** [titoalla17/uts-pl-544463](https://github.com/titoalla17/uts-pl-544463)
+
+---
+
+*FilmKu — Catat film yang ditonton, beri rating, tulis ulasan, dan simpan film favoritmu.*
