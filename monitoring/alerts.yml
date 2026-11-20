@@ -1,0 +1,12 @@
+groups:
+  - name: film_uts_service_alerts
+    rules:
+      - alert: LayananAplikasiMati
+        expr: up == 0
+        for: 15s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Layanan {{ $labels.job }} ({{ $labels.instance }}) tidak merespons!"
+          description: "Target pemantauan {{ $labels.job }} berstatus DOWN selama lebih dari 15 detik."
+          tindakan_pertama: "Segera periksa status container menggunakan perintah 'docker compose ps' dan cek log error terakhir melalui 'docker compose logs --tail=50 {{ $labels.job }}', lalu jalankan ulang container jika terhenti."

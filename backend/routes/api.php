@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
+
 Route::post('login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function (): void {
@@ -61,4 +62,30 @@ Route::get('/health', function (Request $request) {
     }
 
     return response()->json($status, $httpCode);
+});
+
+Route::get('/metrics', function () {
+    // Hitung total request (ditambah 1 setiap kali endpoint/aplikasi diakses)
+    $requestsTotal = Cache::increment('app_http_requests_total');
+    
+    // Cek status hidup layanan (1 = UP, 0 = DOWN)
+    $dbUp = 1;
+    try {
+        DB::connection()->getPdo();
+    } catch (\Exception $e) {
+        $dbUp = 0;
+    }
+
+    $metrics = <<<EOT
+# HELP film_uts_http_requests_total Total HTTP requests handled by FilmKu backend
+# TYPE film_uts_http_requests_total counter
+film_uts_http_requests_total {$requestsTotal}
+
+# HELP film_uts_database_up Database availability status (1 = up, 0 = down)
+# TYPE film_uts_database_up gauge
+film_uts_database_up {$dbUp}
+EOT;
+
+    return response($metrics . "\n", 200)
+        ->header('Content-Type', 'text/plain; version=0.0.4; charset=utf-8');
 });
